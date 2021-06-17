@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package demo;
-
 service GeoService {
     rpc getAllCountries (GeoPingReq) returns (GeoReply) {}
     rpc getAllStates (GeoGetStateReq) returns (GeoReply) {}
