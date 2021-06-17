@@ -8,6 +8,7 @@ const protoLoader = require('@grpc/proto-loader');
 app.use(cors())
 const authHost = '10.102.197.244'
 const geoHost = '10.102.197.112'
+const productHost = '10.102.197.112' //NOT THE ONE
 const port = 8080
 const options = {
     keepCase: true,
@@ -33,12 +34,20 @@ const geoDefinition = protoLoader.loadSync( __dirname + '/protobuf/geo.proto', o
 const geoObject = grpc.loadPackageDefinition(geoDefinition);
 const geoClient = promisifyAll(new geoObject.GeoService(`${geoHost}:${port}`, grpc.credentials.createInsecure()))
 
+const productDefinition = protoLoader.loadSync( __dirname + '/protobuf/product.proto', options);
+const productObject = grpc.loadPackageDefinition(productDefinition);
+const productClient = promisifyAll(new productObject.GeoService(`${productHost}:${port}`, grpc.credentials.createInsecure()))
+
 app.get('/authService', (req, res) => {
-    res.send(authClient.authenticate({mail: 'juan@gmail.com', password: '1234'}))
+    res.send(authClient.authenticate({mail: req.mail, password: req.password}))
 })
 
 app.get('/geoService', (req, res) => {
-    res.send(geoClient.getCountryCityByIP({ip: "8.8.8.8"}))
+    res.send(geoClient.getCountryCityByIP({ip: req}))
+})
+
+app.get('/product', (req, res) => {
+    res.send(productClient.getProducts({}))
 })
 
 app.get('/', (req, res) => {
